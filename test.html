@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The StudyHub | Professional LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900">
+ 
+    <div class="flex h-screen overflow-hidden">
+ 
+        <!-- Sidebar Navigation -->
+        <aside class="w-72 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col">
+            <div class="p-6 border-b bg-indigo-600">
+                <h1 class="text-xl font-bold text-white tracking-tight italic">Padhao | StudyHub</h1>
+            </div>
+ 
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1" id="sidebar-nav">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 px-3">Subject Categories</p>
+                <!-- Subject Links injected by JS -->
+            </div>
+ 
+            <div class="p-4 border-t bg-slate-50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">SM</div>
+                    <div>
+                        <p class="text-xs font-bold">LMS Admin</p>
+                        <p class="text-[10px] text-slate-500">Government Prep Portal</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+ 
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col bg-slate-50 overflow-hidden">
+ 
+            <!-- Top Header -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 z-10">
+                <h2 class="text-lg font-semibold text-slate-700" id="current-subject-title">Select a Subject</h2>
+                <div class="flex space-x-4">
+                    <button class="text-slate-400 hover:text-indigo-600 transition"><i class="fas fa-search"></i></button>
+                    <button class="text-slate-400 hover:text-indigo-600 transition"><i class="fas fa-bell"></i></button>
+                </div>
+            </header>
+ 
+            <!-- Video Grid Area -->
+            <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                <div id="video-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards injected by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+ 
+    <script>
+        // 1. Data Structure: 12 Subjects with 10 Videos each
+        const subjects = [
+            "History", "Geography", "Polity", "Economics", 
+            "General Science", "Environment", "Current Affairs", 
+            "Ethics", "Art & Culture", "Mathematics", 
+            "Reasoning", "English Literature"
+        ];
+ 
+        // 2. Generate the Sidebar
+        const sidebarNav = document.getElementById('sidebar-nav');
+        subjects.forEach((subject, index) => {
+            const btn = document.createElement('button');
+            btn.className = `w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group hover:bg-indigo-50 hover:text-indigo-600 mb-1`;
+            btn.innerHTML = `
+                <i class="fas fa-book-open mr-3 text-slate-400 group-hover:text-indigo-500"></i>
+                <span>${subject}</span>
+            `;
+            btn.onclick = () => loadSubject(subject);
+            sidebarNav.appendChild(btn);
+        });
+ 
+        // 3. Logic to Load Video Cards
+        function loadSubject(subjectName) {
+            document.getElementById('current-subject-title').innerText = subjectName;
+            const grid = document.getElementById('video-grid');
+            grid.innerHTML = ''; // Clear previous cards
+ 
+            // Generate 10 placeholder cards for the chosen subject
+            for (let i = 1; i <= 10; i++) {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group";
+ 
+                card.innerHTML = `
+                    <div class="relative aspect-video bg-slate-200">
+                        <!-- Replace src with your YouTube Thumbnail -->
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                            <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-indigo-600 shadow-xl group-hover:scale-110 transition-transform">
+                                <i class="fas fa-play ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">${subjectName} • Lecture ${i}</span>
+                        <h4 class="font-bold text-slate-800 mt-1 line-clamp-1">Detailed Analysis of Topic ${i}</h4>
+                        <p class="text-xs text-slate-500 mt-2 line-clamp-2">Key concepts and detailed explanations tailored for competitive examination standards.</p>
+ 
+                        <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+                            <a href="#" class="text-xs font-bold text-indigo-600 hover:underline">Watch Video</a>
+                            <a href="YOUR_PDF_URL_HERE" class="flex items-center text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition">
+                                <i class="fas fa-file-pdf mr-2"></i> Download PDF
+                            </a>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+ 
+        // Load first subject by default
+        loadSubject(subjects[0]);
+    </script>
+</body>
+</html>
