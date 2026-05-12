@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -220,6 +220,193 @@
         });
       }
       // Load first subject by default
+      loadSubject(subjects[0]);
+    </script>
+  </body>
+</html> -->
+
+
+<!-- // New Code -------------------------------------------------------- -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The StudyHub | Professional LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+      .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+      
+      /* Smooth transition for mobile sidebar */
+      #sidebar { transition: transform 0.3s ease-in-out; }
+    </style>
+  </head>
+  <body class="bg-slate-50 font-sans text-slate-900">
+    <div class="flex h-screen overflow-hidden relative">
+      
+      <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+      <aside
+        id="sidebar"
+        class="fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-200 z-30 transform -translate-x-full lg:translate-x-0 lg:static lg:inset-0 flex-shrink-0 flex flex-col"
+      >
+        <div class="p-6 border-b bg-green-600 flex justify-between items-center">
+          <h1 class="text-xl font-bold text-white tracking-tight italic">
+            Padhao | StudyHub
+          </h1>
+          <button onclick="toggleSidebar()" class="lg:hidden text-white text-xl">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1" id="sidebar-nav">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 px-3">
+            Subject Categories
+          </p>
+          </div>
+
+        <div class="p-4 border-t bg-slate-50">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+              Padhao🚀
+            </div>
+            <div>
+              <p class="text-xs font-bold">Made with 💖</p>
+              <p class="text-[10px] text-slate-500">Study Well</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="flex-1 flex flex-col bg-slate-50 overflow-hidden w-full">
+        <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 md:px-8 z-10">
+          <div class="flex items-center space-x-4">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-600">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h2 class="text-base md:text-lg font-semibold text-slate-700 truncate" id="current-subject-title">
+              Select a Subject
+            </h2>
+          </div>
+          
+          <div class="flex space-x-2 md:space-x-4">
+            <button class="text-slate-400 hover:text-indigo-600 transition p-2">
+              <i class="fas fa-search"></i>
+            </button>
+            <button class="text-slate-400 hover:text-indigo-600 transition p-2">
+              <i class="fas fa-bell"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+          <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Sidebar Toggle Logic
+      function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+      }
+
+      const subjects = [
+        "History", "Geography", "Polity", "Economics", "General Science",
+        "Environment", "Current Affairs", "Ethics", "Art & Culture",
+        "Mathematics", "CSAT", "English Literature"
+      ];
+
+      const subjectData = {
+        History: [
+          {
+            png: "https://images.pexels.com/photos/35755755/pexels-photo-35755755.jpeg",
+            title: "Ancient India",
+            video: "https://youtu.be/nSf6t12P1W8",
+            pdf: "#",
+          },
+          {
+            png: "https://images.pexels.com/photos/35755755/pexels-photo-35755755.jpeg",
+            title: "Mughal Empire",
+            video: "https://youtu.be/U1FV2SLIjrQ",
+            pdf: "#",
+          },
+        ],
+        Geography: [
+          {
+            png: "https://images.pexels.com/photos/35755755/pexels-photo-35755755.jpeg",
+            title: "Physical Geography",
+            video: "https://youtu.be/fsosgnVGoFQ",
+            pdf: "#",
+          },
+        ],
+        // ... (rest of your subjectData)
+      };
+
+      // Generate the Sidebar
+      const sidebarNav = document.getElementById("sidebar-nav");
+      subjects.forEach((subject) => {
+        const btn = document.createElement("button");
+        btn.className = `w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group hover:bg-indigo-50 hover:text-indigo-600 mb-1`;
+        btn.innerHTML = `
+                <i class="fas fa-book-open mr-3 text-slate-400 group-hover:text-indigo-500"></i>
+                <span>${subject}</span>
+            `;
+        btn.onclick = () => {
+            loadSubject(subject);
+            // Close sidebar automatically on mobile after selecting a subject
+            if (window.innerWidth < 1024) toggleSidebar();
+        };
+        sidebarNav.appendChild(btn);
+      });
+
+      function loadSubject(subjectName) {
+        document.getElementById("current-subject-title").innerText = subjectName;
+        const grid = document.getElementById("video-grid");
+        grid.innerHTML = "";
+
+        const lectures = subjectData[subjectName] || [];
+
+        if (lectures.length === 0) {
+          grid.innerHTML = `<p class="col-span-full text-slate-400 text-center py-10 italic">No content uploaded for ${subjectName} yet.</p>`;
+          return;
+        }
+
+        lectures.forEach((lecture, index) => {
+          const card = document.createElement("div");
+          card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group";
+          card.innerHTML = `
+            <div class="relative aspect-video bg-slate-200">
+                <img src="${lecture.png}" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                    <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-indigo-600 shadow-xl group-hover:scale-110 transition-transform cursor-pointer">
+                        <i class="fas fa-play ml-1"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="p-5">
+                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">${subjectName} • Lecture ${index + 1}</span>
+                <h4 class="font-bold text-slate-800 mt-1 line-clamp-1">${lecture.title}</h4>
+                <div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                    <a href="${lecture.video}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline">Watch Video</a>
+                    <a href="${lecture.pdf}" target="_blank" class="w-full sm:w-auto flex items-center justify-center text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition">
+                        <i class="fas fa-file-pdf mr-2"></i> Download PDF
+                    </a>
+                </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
       loadSubject(subjects[0]);
     </script>
   </body>
