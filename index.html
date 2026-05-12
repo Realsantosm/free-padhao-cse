@@ -386,7 +386,9 @@
           card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group";
           card.innerHTML = `
             <div class="relative aspect-video bg-slate-200">
-                <img src="${lecture.png}" class="w-full h-full object-cover">
+                <a href="${lecture.video}" target="_blank">
+                   <img src="${lecture.png}" class="w-full h-full object-cover">
+                </a>
                 <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                     <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-indigo-600 shadow-xl group-hover:scale-110 transition-transform cursor-pointer">
                         <i class="fas fa-play ml-1"></i>
