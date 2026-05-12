@@ -74,6 +74,17 @@
         </header>
 
         <div class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+          <div class="px-4 md:px-8 pt-4">
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Course Progress</span>
+            <span id="progress-percentage" class="text-xs font-bold text-orange-600">0% Completed</span>
+        </div>
+        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+            <div id="progress-fill" class="bg-orange-500 h-full transition-all duration-500 ease-out" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
           <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
       </main>
@@ -140,12 +151,39 @@
         location.reload();
       }
 
-      function toggleTracker(subject, index) {
-        const key = `${subject}-${index}`;
-        userProgress[key] = !userProgress[key];
-        localStorage.setItem(`progress_${currentUser}`, JSON.stringify(userProgress));
-        loadSubject(subject); // Refresh UI
-      }
+    // Function to calculate and update the progress bar
+function updateProgressBar(subjectName) {
+    const lectures = subjectData[subjectName] || [];
+    if (lectures.length === 0) {
+        document.getElementById("progress-fill").style.width = "0%";
+        document.getElementById("progress-percentage").innerText = "0% Completed";
+        return;
+    }
+
+    let completedCount = 0;
+    lectures.forEach((_, index) => {
+        if (userProgress[`${subjectName}-${index}`]) {
+            completedCount++;
+        }
+    });
+
+    const percentage = Math.round((completedCount / lectures.length) * 100);
+    
+    // Update UI
+    const fill = document.getElementById("progress-fill");
+    const text = document.getElementById("progress-percentage");
+    
+    fill.style.width = `${percentage}%`;
+    text.innerText = `${percentage}% Completed`;
+}
+
+    function toggleTracker(subject, index) {
+    const key = `${subject}-${index}`;
+    userProgress[key] = !userProgress[key];
+    localStorage.setItem(`progress_${currentUser}`, JSON.stringify(userProgress));
+    
+    loadSubject(subject); // This will now call updateProgressBar internally
+   }
 
       function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('-translate-x-full');
@@ -166,55 +204,59 @@
       });
 
       // --- 4. Render Lectures with Tracker ---
-      function loadSubject(subjectName) {
-        document.getElementById("current-subject-title").innerText = subjectName;
-        const grid = document.getElementById("video-grid");
-        grid.innerHTML = "";
-        const lectures = subjectData[subjectName] || [];
+    function loadSubject(subjectName) {
+    document.getElementById("current-subject-title").innerText = subjectName.replace(/_/g, ' ');
+    const grid = document.getElementById("video-grid");
+    grid.innerHTML = "";
+    
+    const lectures = subjectData[subjectName] || [];
 
-        if (lectures.length === 0) {
-            grid.innerHTML = `<p class="col-span-full text-slate-400 text-center py-10 italic">No content uploaded for ${subjectName} yet.</p>`;
-            return;
-        }
+    // Update the progress bar whenever a subject is loaded
+    updateProgressBar(subjectName);
 
-        lectures.forEach((lecture, index) => {
-            const isCompleted = userProgress[`${subjectName}-${index}`];
-            const card = document.createElement("div");
-            card.className = `bg-white rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md group relative ${isCompleted ? 'border-green-200 bg-green-50/20' : 'border-slate-200'}`;
-            
-            card.innerHTML = `
-                <div class="relative aspect-video bg-slate-200 overflow-hidden">
-                    <a href="${lecture.video}" target="_blank" class="block w-full h-full">
-                        <img src="${lecture.png}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+    if (lectures.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-slate-400 text-center py-10 italic">No content uploaded for ${subjectName} yet.</p>`;
+        return;
+    }
+
+    lectures.forEach((lecture, index) => {
+        const isCompleted = userProgress[`${subjectName}-${index}`];
+        const card = document.createElement("div");
+        card.className = `bg-white rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md group relative ${isCompleted ? 'border-orange-200 bg-orange-50/10' : 'border-slate-200'}`;
+        
+        card.innerHTML = `
+            <div class="relative aspect-video bg-slate-200 overflow-hidden">
+                <a href="${lecture.video}" target="_blank" class="block w-full h-full">
+                    <img src="${lecture.png}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                </a>
+                ${isCompleted ? '<div class="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg">COMPLETED</div>' : ''}
+            </div>
+
+            <div class="p-5">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">${subjectName.replace(/_/g, ' ')} • Lecture ${index + 1}</span>
+                        <h4 class="font-bold text-slate-800 mt-1 line-clamp-1">${lecture.title}</h4>
+                    </div>
+                    <button onclick="toggleTracker('${subjectName}', ${index})" 
+                            class="ml-4 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all 
+                            ${isCompleted ? 'bg-orange-500 border-orange-500 text-white' : 'border-slate-200 text-transparent hover:border-orange-500'}">
+                        <i class="fas fa-check text-xs"></i>
+                    </button>
+                </div>
+                
+                <div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                    <a href="${lecture.video}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline">Watch Video</a>
+                    <a href="${lecture.pdf}" target="_blank" class="w-full sm:w-auto flex items-center justify-center text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition">
+                        <i class="fas fa-file-pdf mr-2"></i> PDF
                     </a>
-                    ${isCompleted ? '<div class="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg">COMPLETED</div>' : ''}
                 </div>
-
-                <div class="p-5">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">${subjectName} • Lecture ${index + 1}</span>
-                            <h4 class="font-bold text-slate-800 mt-1 line-clamp-1">${lecture.title}</h4>
-                        </div>
-                        <button onclick="toggleTracker('${subjectName}', ${index})" 
-                                class="ml-4 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all 
-                                ${isCompleted ? 'bg-green-500 border-orange-500 text-white' : 'border-slate-200 text-transparent hover:border-green-500'}">
-                            <i class="fas fa-check text-xs"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3 items-center justify-between">
-                        <a href="${lecture.video}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline">Watch Video</a>
-                        <a href="${lecture.pdf}" target="_blank" class="w-full sm:w-auto flex items-center justify-center text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition">
-                            <i class="fas fa-file-pdf mr-2"></i> PDF
-                        </a>
-                    </div>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-      }
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
 
       // Initialize
       checkAuth();
